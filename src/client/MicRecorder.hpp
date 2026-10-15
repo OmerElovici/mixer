@@ -17,7 +17,7 @@ public:
     MicRecorder(MicRecorder&& other) noexcept = delete;
     MicRecorder& operator=(MicRecorder&& other) noexcept = delete;
 
-    ~MicRecorder() = default;
+    ~MicRecorder() override = default;
 
 protected:
     bool onProcessSamples(const std::int16_t* samples, std::size_t sample_count) override;
