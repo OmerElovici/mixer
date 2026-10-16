@@ -8,6 +8,18 @@ function(mixer_setup_dependencies)
   # For each dependency, see if it's
   # already been provided to us by a parent project
 
+  if(NOT TARGET readerwriterqueue)
+    cpmaddpackage(
+      NAME
+      readerwriterqueue
+      VERSION
+      1.0.7
+      GITHUB_REPOSITORY
+      "cameron314/readerwriterqueue"
+      SYSTEM
+      YES)
+  endif()
+
   if(NOT TARGET spdlog::spdlog)
     cpmaddpackage(
       NAME
