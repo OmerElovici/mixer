@@ -1,15 +1,13 @@
 #pragma once
 
 #include <SFML/Audio.hpp>
-#include <expected>
-#include <memory>
-#include <string>
-#include <system_error>
+#include "ISamplesProcessor.hpp"
 
 class MicRecorder : public sf::SoundRecorder {
 public:
-    static std::expected<std::unique_ptr<MicRecorder>, std::error_code> create(
-        const std::string& input_device);
+    // static std::expected<std::unique_ptr<MicRecorder>, std::error_code> create(
+    //     const std::string& input_device);
+
 
     MicRecorder(const MicRecorder& other) = delete;
     MicRecorder& operator=(const MicRecorder& other) = delete;
@@ -17,21 +15,18 @@ public:
     MicRecorder(MicRecorder&& other) noexcept = delete;
     MicRecorder& operator=(MicRecorder&& other) noexcept = delete;
 
+
+    void set_processor(ISamplesProcessor* processor);
     ~MicRecorder() override = default;
 
+    MicRecorder() = default;
+
 protected:
+    bool onStart() override;
+
     bool onProcessSamples(const std::int16_t* samples, std::size_t sample_count) override;
 
 
-    // bool onProcessSamples(const std::int16_t* samples, std::size_t sampleCount) override
-    // {
-    //     // do something useful with the new chunk of samples
-    //     ...
-
-    //     // return true to continue the capture, or false to stop it
-    //     return true;
-    // }
-
 private:
-    MicRecorder() = default;
+    ISamplesProcessor* processor_ = nullptr;
 };

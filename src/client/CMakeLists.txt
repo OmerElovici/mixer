@@ -1,5 +1,8 @@
 add_executable(client main.cpp
-  MicRecorder.cpp)
+  MicRecorder.cpp
+  Pacer.cpp
+  Client.cpp
+  AudioChunk.cpp)
 
 target_link_libraries(
   client
@@ -8,6 +11,7 @@ target_link_libraries(
           SFML::Audio
           rtpcpp
           spdlog::spdlog
+          readerwriterqueue
 )
 
 mixer_configure_linker(client)

@@ -4,8 +4,6 @@
 #include <random>
 #include <stdexcept>
 
-
-
 namespace RtpCpp {
 
 bool is_audio_pt(const std::uint8_t payload_type) noexcept {
@@ -136,9 +134,6 @@ bool is_valid_pt(const std::uint8_t payload_type) noexcept {
 
 } // namespace RtpCpp
 
-
-
-
 namespace RtpCpp {
 
 const char* RtpPacketCatagory::name() const noexcept { // NOLINT
@@ -177,7 +172,6 @@ std::error_code make_error_code(Result err) noexcept {
 }
 
 } // namespace RtpCpp
-
 
 // NOLINTBEGIN
 /*
@@ -248,28 +242,21 @@ struct Struct32B {
 #endif
 } // namespace
 
-static_assert(
-    sizeof(SmallVector<void*, 0>) == sizeof(unsigned) * 2 + sizeof(void*),
-    "wasted space in SmallVector size 0");
-static_assert(
-    alignof(SmallVector<Struct16B, 0>) >= alignof(Struct16B),
-    "wrong alignment for 16-byte aligned T");
-static_assert(
-    alignof(SmallVector<Struct32B, 0>) >= alignof(Struct32B),
-    "wrong alignment for 32-byte aligned T");
-static_assert(
-    sizeof(SmallVector<Struct16B, 0>) >= alignof(Struct16B),
-    "missing padding for 16-byte aligned T");
-static_assert(
-    sizeof(SmallVector<Struct32B, 0>) >= alignof(Struct32B),
-    "missing padding for 32-byte aligned T");
-static_assert(
-    sizeof(SmallVector<void*, 1>) == sizeof(unsigned) * 2 + sizeof(void*) * 2,
-    "wasted space in SmallVector size 1");
+static_assert(sizeof(SmallVector<void*, 0>) == sizeof(unsigned) * 2 + sizeof(void*),
+              "wasted space in SmallVector size 0");
+static_assert(alignof(SmallVector<Struct16B, 0>) >= alignof(Struct16B),
+              "wrong alignment for 16-byte aligned T");
+static_assert(alignof(SmallVector<Struct32B, 0>) >= alignof(Struct32B),
+              "wrong alignment for 32-byte aligned T");
+static_assert(sizeof(SmallVector<Struct16B, 0>) >= alignof(Struct16B),
+              "missing padding for 16-byte aligned T");
+static_assert(sizeof(SmallVector<Struct32B, 0>) >= alignof(Struct32B),
+              "missing padding for 32-byte aligned T");
+static_assert(sizeof(SmallVector<void*, 1>) == sizeof(unsigned) * 2 + sizeof(void*) * 2,
+              "wasted space in SmallVector size 1");
 
-static_assert(
-    sizeof(SmallVector<char, 0>) == sizeof(void*) * 2 + sizeof(void*),
-    "1 byte elements have word-sized type for size and capacity");
+static_assert(sizeof(SmallVector<char, 0>) == sizeof(void*) * 2 + sizeof(void*),
+              "1 byte elements have word-sized type for size and capacity");
 
 /// Report that MinSize doesn't fit into this vector's size type. Throws
 /// std::length_error or calls report_fatal_error.
@@ -351,11 +338,8 @@ static void* replaceAllocation(void* NewElts, size_t TSize, size_t NewCapacity, 
 
 // Note: Moving this function into the header may cause performance regression.
 template <class Size_T>
-void* SmallVectorBase<Size_T>::mallocForGrow(
-    void* FirstEl,
-    size_t MinSize,
-    size_t TSize,
-    size_t& NewCapacity) {
+void* SmallVectorBase<Size_T>::mallocForGrow(void* FirstEl, size_t MinSize, size_t TSize,
+                                             size_t& NewCapacity) {
     NewCapacity = getNewCapacity<Size_T>(MinSize, TSize, this->capacity());
     // Even if capacity is not 0 now, if the vector was originally created with
     // capacity 0, it's possible for the malloc to return FirstEl.
@@ -397,26 +381,20 @@ template class RtpCpp::llvm::SmallVectorBase<uint32_t>;
 template class RtpCpp::llvm::SmallVectorBase<uint64_t>;
 
 // Assertions to ensure this #if stays in sync with SmallVectorSizeType.
-static_assert(
-    sizeof(SmallVectorSizeType<char>) == sizeof(uint64_t),
-    "Expected SmallVectorBase<uint64_t> variant to be in use.");
+static_assert(sizeof(SmallVectorSizeType<char>) == sizeof(uint64_t),
+              "Expected SmallVectorBase<uint64_t> variant to be in use.");
 #else
-static_assert(
-    sizeof(SmallVectorSizeType<char>) == sizeof(uint32_t),
-    "Expected SmallVectorBase<uint32_t> variant to be in use.");
+static_assert(sizeof(SmallVectorSizeType<char>) == sizeof(uint32_t),
+              "Expected SmallVectorBase<uint32_t> variant to be in use.");
 #endif
 // NOLINTEND
 
-
-
 namespace RtpCpp {
 
-RtpTransport::RtpTransport(asio::any_io_executor executor)
-    : executor_(std::move(executor)) {}
+RtpTransport::RtpTransport(asio::any_io_executor executor) : executor_(std::move(executor)) {}
 
-std::expected<void, std::error_code> RtpTransport::bind(
-    std::string_view address,
-    unsigned short port) {
+std::expected<void, std::error_code> RtpTransport::bind(std::string_view address,
+                                                        unsigned short port) {
     const auto endpoint = Detail::make_udp_endpoint(address, port);
     if (!endpoint) {
         return std::unexpected(endpoint.error());
@@ -440,8 +418,8 @@ std::expected<void, std::error_code> RtpTransport::bind(const asio::ip::udp::end
     return {};
 }
 
-std::expected<void, std::error_code> RtpTransport::bind(
-    std::shared_ptr<asio::ip::udp::socket> socket) {
+std::expected<void, std::error_code>
+RtpTransport::bind(std::shared_ptr<asio::ip::udp::socket> socket) {
     if (!socket) {
         return std::unexpected(to_error_code(asio::error::bad_descriptor));
     }
@@ -506,9 +484,8 @@ using namespace Detail;
 BasicRawRtpSender::BasicRawRtpSender(asio::any_io_executor executor)
     : transport_(std::move(executor)) {}
 
-std::expected<void, std::error_code> BasicRawRtpSender::bind(
-    std::string_view address,
-    unsigned short port) {
+std::expected<void, std::error_code> BasicRawRtpSender::bind(std::string_view address,
+                                                             unsigned short port) {
     return transport_.bind(address, port);
 }
 
@@ -516,8 +493,8 @@ std::expected<void, std::error_code> BasicRawRtpSender::bind(const asio::ip::udp
     return transport_.bind(local);
 }
 
-std::expected<void, std::error_code> BasicRawRtpSender::bind(
-    std::shared_ptr<asio::ip::udp::socket> socket) {
+std::expected<void, std::error_code>
+BasicRawRtpSender::bind(std::shared_ptr<asio::ip::udp::socket> socket) {
     return transport_.bind(std::move(socket));
 }
 
@@ -533,18 +510,16 @@ bool BasicRawRtpSender::close(CloseCallback callback, bool close_socket) {
     if (close_socket) {
         transport_.clear_local_endpoint();
     }
-    asio::post(
-        transport_.get_executor(),
-        [self = shared_from_this(), callback = std::move(callback), close_socket] mutable {
-            self->transport_.apply_socket_action(close_socket);
-            invoke_callback(std::move(callback));
-        });
+    asio::post(transport_.get_executor(),
+               [self = shared_from_this(), callback = std::move(callback), close_socket] mutable {
+                   self->transport_.apply_socket_action(close_socket);
+                   invoke_callback(std::move(callback));
+               });
     return true;
 }
 
-std::expected<void, std::error_code> BasicRawRtpSender::set_default_dst(
-    std::string_view address,
-    unsigned short port) {
+std::expected<void, std::error_code> BasicRawRtpSender::set_default_dst(std::string_view address,
+                                                                        unsigned short port) {
     const auto endpoint = Detail::make_udp_endpoint(address, port);
 
     if (!endpoint) {
@@ -554,8 +529,8 @@ std::expected<void, std::error_code> BasicRawRtpSender::set_default_dst(
     return set_default_dst(endpoint.value());
 }
 
-std::expected<void, std::error_code> BasicRawRtpSender::set_default_dst(
-    const asio::ip::udp::endpoint& dst) {
+std::expected<void, std::error_code>
+BasicRawRtpSender::set_default_dst(const asio::ip::udp::endpoint& dst) {
     default_dst_ = dst;
     return {};
 }
@@ -569,35 +544,30 @@ void BasicRawRtpSender::clear_default_dst() {
 }
 
 template <typename ConcreteHandler>
-void BasicRawRtpSender::execute_async_send_to(
-    std::span<const std::uint8_t> pkt,
-    const asio::ip::udp::endpoint& dst,
-    ConcreteHandler&& wrapped_handler) {
+void BasicRawRtpSender::execute_async_send_to(std::span<const std::uint8_t> pkt,
+                                              const asio::ip::udp::endpoint& dst,
+                                              ConcreteHandler&& wrapped_handler) {
     auto* const socket = transport_.get_socket();
     if (socket == nullptr || !socket->is_open()) {
         const auto exec = asio::get_associated_executor(wrapped_handler, transport_.get_executor());
-        asio::post(
-            transport_.get_executor(),
-            bind_callback_executor(
-                exec,
-                [handler = std::forward<ConcreteHandler>(wrapped_handler)] mutable {
-                    std::move(handler)(to_error_code(asio::error::bad_descriptor), std::size_t{});
-                }));
+        asio::post(transport_.get_executor(),
+                   bind_callback_executor(
+                       exec, [handler = std::forward<ConcreteHandler>(wrapped_handler)] mutable {
+                           std::move(handler)(to_error_code(asio::error::bad_descriptor),
+                                              std::size_t{});
+                       }));
         return;
     }
 
     socket->async_send_to(asio::buffer(pkt), dst, std::forward<ConcreteHandler>(wrapped_handler));
 }
 
-void BasicRawRtpSender::async_send_pkt(
-    std::span<const std::uint8_t> raw_packet,
-    const asio::ip::udp::endpoint& dst,
-    OnRawRtpSend callback) {
+void BasicRawRtpSender::async_send_pkt(std::span<const std::uint8_t> raw_packet,
+                                       const asio::ip::udp::endpoint& dst, OnRawRtpSend callback) {
     const auto exec = asio::get_associated_executor(callback, transport_.get_executor());
     auto bound_handler = bind_callback_executor(
-        exec,
-        [self = shared_from_this(),
-         cab = std::move(callback)](const std::error_code& err, std::size_t bytes_sent) mutable {
+        exec, [self = shared_from_this(), cab = std::move(callback)](
+                  const std::error_code& err, std::size_t bytes_sent) mutable {
             if (err == to_error_code(asio::error::operation_aborted)) {
                 return;
             }
@@ -605,24 +575,20 @@ void BasicRawRtpSender::async_send_pkt(
         });
 
     // The bound handler retains self through dispatch and send completion.
-    asio::dispatch(
-        transport_.get_executor(),
-        [this, raw_packet, dst, handler = std::move(bound_handler)] mutable {
-            execute_async_send_to(raw_packet, dst, std::move(handler));
-        });
+    asio::dispatch(transport_.get_executor(),
+                   [this, raw_packet, dst, handler = std::move(bound_handler)] mutable {
+                       execute_async_send_to(raw_packet, dst, std::move(handler));
+                   });
 }
 
-void BasicRawRtpSender::async_send_pkt(
-    std::span<const std::uint8_t> raw_packet,
-    OnRawRtpSend callback) {
+void BasicRawRtpSender::async_send_pkt(std::span<const std::uint8_t> raw_packet,
+                                       OnRawRtpSend callback) {
     if (!default_dst_) {
-        post_callback(
-            transport_.get_executor(),
-            std::move(callback),
-            std::size_t{
-                0,
-            },
-            std::make_error_code(std::errc::destination_address_required));
+        post_callback(transport_.get_executor(), std::move(callback),
+                      std::size_t{
+                          0,
+                      },
+                      std::make_error_code(std::errc::destination_address_required));
         return;
     }
 
@@ -640,23 +606,21 @@ void BasicRawRtpSender::async_send_pkt(
 #endif
 
 
-
 namespace RtpCpp {
 
 using namespace Detail;
 
-std::shared_ptr<ConcurrentRawRtpSender> ConcurrentRawRtpSender::create(
-    const asio::any_io_executor& executor,
-    std::size_t max_channel_size) {
+std::shared_ptr<ConcurrentRawRtpSender>
+ConcurrentRawRtpSender::create(const asio::any_io_executor& executor,
+                               std::size_t max_channel_size) {
     auto sender = std::shared_ptr<ConcurrentRawRtpSender>(
         new ConcurrentRawRtpSender(executor, max_channel_size));
     sender->start_channel_loop(sender);
     return sender;
 }
 
-ConcurrentRawRtpSender::ConcurrentRawRtpSender(
-    const asio::any_io_executor& executor,
-    std::size_t max_channel_size)
+ConcurrentRawRtpSender::ConcurrentRawRtpSender(const asio::any_io_executor& executor,
+                                               std::size_t max_channel_size)
     : sender_(std::make_shared<BasicRawRtpSender>(executor))
     , channel_(executor, max_channel_size) {}
 
@@ -664,30 +628,28 @@ asio::any_io_executor ConcurrentRawRtpSender::get_executor() {
     return channel_.get_executor();
 }
 
-std::expected<void, std::error_code> ConcurrentRawRtpSender::bind(
-    std::string_view address,
-    unsigned short port) {
+std::expected<void, std::error_code> ConcurrentRawRtpSender::bind(std::string_view address,
+                                                                  unsigned short port) {
     return sender_->bind(address, port);
 }
 
-std::expected<void, std::error_code> ConcurrentRawRtpSender::bind(
-    const asio::ip::udp::endpoint& local) {
+std::expected<void, std::error_code>
+ConcurrentRawRtpSender::bind(const asio::ip::udp::endpoint& local) {
     return sender_->bind(local);
 }
 
-std::expected<void, std::error_code> ConcurrentRawRtpSender::bind(
-    std::shared_ptr<asio::ip::udp::socket> socket) {
+std::expected<void, std::error_code>
+ConcurrentRawRtpSender::bind(std::shared_ptr<asio::ip::udp::socket> socket) {
     return sender_->bind(std::move(socket));
 }
 
-std::expected<void, std::error_code> ConcurrentRawRtpSender::set_default_dst(
-    std::string_view address,
-    unsigned short port) {
+std::expected<void, std::error_code>
+ConcurrentRawRtpSender::set_default_dst(std::string_view address, unsigned short port) {
     return sender_->set_default_dst(address, port);
 }
 
-std::expected<void, std::error_code> ConcurrentRawRtpSender::set_default_dst(
-    const asio::ip::udp::endpoint& dst) {
+std::expected<void, std::error_code>
+ConcurrentRawRtpSender::set_default_dst(const asio::ip::udp::endpoint& dst) {
     return sender_->set_default_dst(dst);
 }
 
@@ -699,8 +661,8 @@ std::optional<asio::ip::udp::endpoint> ConcurrentRawRtpSender::get_default_dst()
     return sender_->get_default_dst();
 }
 
-std::expected<asio::ip::udp::endpoint, std::error_code> ConcurrentRawRtpSender::local_endpoint()
-    const {
+std::expected<asio::ip::udp::endpoint, std::error_code>
+ConcurrentRawRtpSender::local_endpoint() const {
     return sender_->local_endpoint();
 }
 
@@ -713,35 +675,30 @@ bool ConcurrentRawRtpSender::close(CloseCallback callback, bool close_socket) {
         close_socket);
 }
 
-void ConcurrentRawRtpSender::async_send_pkt(
-    std::span<const std::uint8_t> raw_packet,
-    const asio::ip::udp::endpoint& dst,
-    OnRawRtpSend callback) {
+void ConcurrentRawRtpSender::async_send_pkt(std::span<const std::uint8_t> raw_packet,
+                                            const asio::ip::udp::endpoint& dst,
+                                            OnRawRtpSend callback) {
     enqueue_packet(raw_packet, dst, std::move(callback));
 }
 
-void ConcurrentRawRtpSender::async_send_pkt(
-    std::span<const std::uint8_t> raw_packet,
-    OnRawRtpSend callback) {
+void ConcurrentRawRtpSender::async_send_pkt(std::span<const std::uint8_t> raw_packet,
+                                            OnRawRtpSend callback) {
     auto const dst = get_default_dst();
     if (!dst) {
-        post_callback(
-            channel_.get_executor(),
-            std::move(callback),
-            std::size_t{
-                0,
-            },
-            std::make_error_code(std::errc::destination_address_required));
+        post_callback(channel_.get_executor(), std::move(callback),
+                      std::size_t{
+                          0,
+                      },
+                      std::make_error_code(std::errc::destination_address_required));
         return;
     }
 
     enqueue_packet(raw_packet, dst.value(), std::move(callback));
 }
 
-void ConcurrentRawRtpSender::enqueue_packet(
-    std::span<const std::uint8_t> raw_packet,
-    const asio::ip::udp::endpoint& dst,
-    OnRawRtpSend callback) {
+void ConcurrentRawRtpSender::enqueue_packet(std::span<const std::uint8_t> raw_packet,
+                                            const asio::ip::udp::endpoint& dst,
+                                            OnRawRtpSend callback) {
     ChannelData data{
         .remote_ = dst,
         .buffer_ = std::vector<std::uint8_t>(raw_packet.begin(), raw_packet.end()),
@@ -757,16 +714,14 @@ void ConcurrentRawRtpSender::enqueue_packet(
     }
 }
 
-void ConcurrentRawRtpSender::handle_packet(
-    std::vector<std::uint8_t> buffer,
-    const asio::ip::udp::endpoint& dst,
-    OnRawRtpSend callback) {
+void ConcurrentRawRtpSender::handle_packet(std::vector<std::uint8_t> buffer,
+                                           const asio::ip::udp::endpoint& dst,
+                                           OnRawRtpSend callback) {
     const std::span<const std::uint8_t> pkt_span(buffer);
     const auto exec = asio::get_associated_executor(callback, channel_.get_executor());
     auto bound_handler = bind_callback_executor(
-        exec,
-        [pkt_buf = std::move(buffer),
-         cab = std::move(callback)](std::size_t bytes_sent, const std::error_code& err) mutable {
+        exec, [pkt_buf = std::move(buffer), cab = std::move(callback)](
+                  std::size_t bytes_sent, const std::error_code& err) mutable {
             if (err == RtpCpp::to_error_code(asio::error::operation_aborted)) {
                 return;
             }
@@ -778,9 +733,8 @@ void ConcurrentRawRtpSender::handle_packet(
 
 void ConcurrentRawRtpSender::start_channel_loop(std::shared_ptr<ConcurrentRawRtpSender> self) {
     for (;;) {
-        const bool rec = channel_.try_receive([this](
-                                                  const RtpCpp::asio_error_code& err,
-                                                  ChannelData data) {
+        const bool rec = channel_.try_receive([this](const RtpCpp::asio_error_code& err,
+                                                     ChannelData data) {
             if (err) {
                 if (err != RtpCpp::to_error_code(asio::error::operation_aborted) &&
                     data.callback_) {
@@ -795,9 +749,8 @@ void ConcurrentRawRtpSender::start_channel_loop(std::shared_ptr<ConcurrentRawRtp
         }
     }
 
-    channel_.async_receive([self = std::move(self)](
-                               const RtpCpp::asio_error_code& err,
-                               ChannelData data) mutable {
+    channel_.async_receive([self = std::move(self)](const RtpCpp::asio_error_code& err,
+                                                    ChannelData data) mutable {
         if (err) {
             if (err != RtpCpp::to_error_code(asio::error::operation_aborted) && data.callback_) {
                 dispatch_callback(self->channel_.get_executor(), std::move(data.callback_), 0, err);
@@ -829,11 +782,10 @@ namespace RtpCpp {
 
 using namespace Detail;
 
-static std::error_code process_datagram(
-    const asio::ip::udp::endpoint& sender_info,
-    RtpPacketView& pkt,
-    std::size_t bytes_received,
-    const std::optional<asio::ip::udp::endpoint>& source_filter) {
+static std::error_code
+process_datagram(const asio::ip::udp::endpoint& sender_info, RtpPacketView& pkt,
+                 std::size_t bytes_received,
+                 const std::optional<asio::ip::udp::endpoint>& source_filter) {
     if (source_filter && sender_info != *source_filter) {
         // TODO this is kinda inaccurate and maybe will conflict with asio errors?
         return std::make_error_code(std::errc::invalid_argument);
@@ -842,8 +794,7 @@ static std::error_code process_datagram(
     return pkt.parse(bytes_received);
 }
 
-RtpReceiver::RtpReceiver(asio::any_io_executor executor)
-    : transport_(std::move(executor)) {}
+RtpReceiver::RtpReceiver(asio::any_io_executor executor) : transport_(std::move(executor)) {}
 
 bool RtpReceiver::start_recv_loop(OnRtpPacket callback, const asio::any_io_executor& executor) {
     if (callback == nullptr) {
@@ -851,19 +802,18 @@ bool RtpReceiver::start_recv_loop(OnRtpPacket callback, const asio::any_io_execu
     }
 
     std::uint8_t expected = std::to_underlying(StateMask::kIdle);
-    if (!state_.compare_exchange_strong(
-            expected, std::to_underlying(StateMask::kLooping), std::memory_order_relaxed)) {
+    if (!state_.compare_exchange_strong(expected, std::to_underlying(StateMask::kLooping),
+                                        std::memory_order_relaxed)) {
         return false;
     }
 
 
-    asio::dispatch(
-        transport_.get_executor(),
-        [self = shared_from_this(), callback = std::move(callback), executor] mutable {
-            self->on_rtp_pkt_ = std::move(callback);
-            self->loop_exec_ = (executor != nullptr) ? executor : self->transport_.get_executor();
-            self->do_recv_loop_impl();
-        });
+    asio::dispatch(transport_.get_executor(), [self = shared_from_this(),
+                                               callback = std::move(callback), executor] mutable {
+        self->on_rtp_pkt_ = std::move(callback);
+        self->loop_exec_ = (executor != nullptr) ? executor : self->transport_.get_executor();
+        self->do_recv_loop_impl();
+    });
     return true;
 }
 
@@ -888,9 +838,9 @@ void RtpReceiver::do_recv_loop_impl() {
     }
 
 
-    auto executor_cab = bind_callback_executor(
-        loop_exec_,
-        [self = shared_from_this()](const std::error_code& err, std::size_t bytes_received) {
+    auto executor_cab =
+        bind_callback_executor(loop_exec_, [self = shared_from_this()](const std::error_code& err,
+                                                                       std::size_t bytes_received) {
             bool continue_loop = true;
             RtpPacketView pkt{std::span<std::uint8_t>{self->rx_buffer_.data(), bytes_received}};
 
@@ -929,14 +879,12 @@ void RtpReceiver::do_recv_loop_impl() {
 }
 
 void RtpReceiver::do_recv_loop() {
-    asio::dispatch(transport_.get_executor(), [self = shared_from_this()] {
-        self->do_recv_loop_impl();
-    });
+    asio::dispatch(transport_.get_executor(),
+                   [self = shared_from_this()] { self->do_recv_loop_impl(); });
 }
 
-std::expected<void, std::error_code> RtpReceiver::bind(
-    std::string_view address,
-    unsigned short port) {
+std::expected<void, std::error_code> RtpReceiver::bind(std::string_view address,
+                                                       unsigned short port) {
     const auto result = transport_.bind(address, port);
     if (result) {
         state_.store(std::to_underlying(StateMask::kIdle), std::memory_order_relaxed);
@@ -952,8 +900,8 @@ std::expected<void, std::error_code> RtpReceiver::bind(const asio::ip::udp::endp
     return result;
 }
 
-std::expected<void, std::error_code> RtpReceiver::bind(
-    std::shared_ptr<asio::ip::udp::socket> socket) {
+std::expected<void, std::error_code>
+RtpReceiver::bind(std::shared_ptr<asio::ip::udp::socket> socket) {
     const auto result = transport_.bind(std::move(socket));
     if (result) {
         state_.store(std::to_underlying(StateMask::kIdle), std::memory_order_relaxed);
@@ -980,18 +928,17 @@ bool RtpReceiver::close(CloseCallback callback, bool close_socket) {
         transport_.clear_local_endpoint();
     }
 
-    asio::post(
-        transport_.get_executor(),
-        [self = shared_from_this(), callback = std::move(callback), close_socket] mutable {
-            self->transport_.apply_socket_action(close_socket);
-            self->close_cab_ = std::move(callback);
-            self->stop_action_ = close_socket ? StopAction::kClose : StopAction::kCancel;
-            // Even if cancellation fails, an outstanding receive must finish first.
-            if ((self->state_.load(std::memory_order_relaxed) &
-                 std::to_underlying(StateMask::kLooping)) == 0) {
-                self->finish_close();
-            }
-        });
+    asio::post(transport_.get_executor(),
+               [self = shared_from_this(), callback = std::move(callback), close_socket] mutable {
+                   self->transport_.apply_socket_action(close_socket);
+                   self->close_cab_ = std::move(callback);
+                   self->stop_action_ = close_socket ? StopAction::kClose : StopAction::kCancel;
+                   // Even if cancellation fails, an outstanding receive must finish first.
+                   if ((self->state_.load(std::memory_order_relaxed) &
+                        std::to_underlying(StateMask::kLooping)) == 0) {
+                       self->finish_close();
+                   }
+               });
     return true;
 }
 
@@ -1015,20 +962,18 @@ void RtpReceiver::finish_close() {
     const bool can_restart =
         stop_action_ == StopAction::kCancel && socket != nullptr && socket->is_open();
     stop_action_ = StopAction::kNone;
-    state_.store(
-        std::to_underlying(can_restart ? StateMask::kIdle : StateMask::kClosed),
-        std::memory_order_relaxed);
+    state_.store(std::to_underlying(can_restart ? StateMask::kIdle : StateMask::kClosed),
+                 std::memory_order_relaxed);
     if (callback) {
         callback();
     }
 }
 
 void RtpReceiver::async_receive_pkt(OnRtpRecvFrom callback) {
-    asio::dispatch(
-        transport_.get_executor(),
-        [self = shared_from_this(), cab = std::move(callback)] mutable {
-            self->async_receive_pkt_impl(std::move(cab));
-        });
+    asio::dispatch(transport_.get_executor(),
+                   [self = shared_from_this(), cab = std::move(callback)] mutable {
+                       self->async_receive_pkt_impl(std::move(cab));
+                   });
 }
 
 void RtpReceiver::set_source_filter(std::optional<asio::ip::udp::endpoint> source_filter) {
@@ -1038,12 +983,9 @@ void RtpReceiver::set_source_filter(std::optional<asio::ip::udp::endpoint> sourc
 void RtpReceiver::async_receive_pkt_impl(OnRtpRecvFrom callback) {
     auto* const socket = transport_.get_socket();
     if (socket == nullptr || !socket->is_open()) {
-        post_callback(
-            transport_.get_executor(),
-            std::move(callback),
-            RtpPacketView{std::span<std::uint8_t>{}},
-            asio::ip::udp::endpoint{},
-            to_error_code(asio::error::bad_descriptor));
+        post_callback(transport_.get_executor(), std::move(callback),
+                      RtpPacketView{std::span<std::uint8_t>{}}, asio::ip::udp::endpoint{},
+                      to_error_code(asio::error::bad_descriptor));
         return;
     }
 
@@ -1052,13 +994,10 @@ void RtpReceiver::async_receive_pkt_impl(OnRtpRecvFrom callback) {
 
     const auto exec = asio::get_associated_executor(callback, transport_.get_executor());
     socket->async_receive_from(
-        buff,
-        sender_info_,
+        buff, sender_info_,
         bind_callback_executor(
-            exec,
-            [self, cab = std::move(callback)](
-                const std::error_code& err,
-                std::size_t bytes_received) mutable {
+            exec, [self, cab = std::move(callback)](const std::error_code& err,
+                                                    std::size_t bytes_received) mutable {
                 RtpPacketView pkt{std::span<std::uint8_t>{self->rx_buffer_.data(), bytes_received}};
                 if (err) {
                     invoke_callback(std::move(cab), pkt, self->sender_info_, err);
@@ -1079,8 +1018,6 @@ void RtpReceiver::async_receive_pkt_impl(OnRtpRecvFrom callback) {
 
 
 } // namespace RtpCpp
-
-
 
 namespace RtpCpp {
 
@@ -1149,11 +1086,9 @@ static void write_state_to_pkt(RtpPacketView& pkt, const RtpSenderState::Updated
     pkt.set_marker(state.marked_);
 }
 
-RtpSender::SendContext::SendContext(
-    std::shared_ptr<IRawRtpSender> raw_sender,
-    RtpSenderConfig config)
-    : state_(config.ssrc_)
-    , raw_sender_(std::move(raw_sender)) {
+RtpSender::SendContext::SendContext(std::shared_ptr<IRawRtpSender> raw_sender,
+                                    RtpSenderConfig config)
+    : state_(config.ssrc_), raw_sender_(std::move(raw_sender)) {
     state_.set_payload_type(config.payload_type_);
     state_.set_timestamp_increment(config.default_timestamp_step_);
 }
@@ -1165,9 +1100,8 @@ asio::any_io_executor RtpSender::get_executor() {
     return context_->raw_sender_->get_executor();
 }
 
-std::expected<void, std::error_code> RtpSender::bind(
-    std::string_view address,
-    unsigned short port) {
+std::expected<void, std::error_code> RtpSender::bind(std::string_view address,
+                                                     unsigned short port) {
     return context_->raw_sender_->bind(address, port);
 }
 
@@ -1175,8 +1109,8 @@ std::expected<void, std::error_code> RtpSender::bind(const asio::ip::udp::endpoi
     return context_->raw_sender_->bind(local);
 }
 
-std::expected<void, std::error_code> RtpSender::bind(
-    std::shared_ptr<asio::ip::udp::socket> socket) {
+std::expected<void, std::error_code>
+RtpSender::bind(std::shared_ptr<asio::ip::udp::socket> socket) {
     return context_->raw_sender_->bind(std::move(socket));
 }
 
@@ -1184,14 +1118,13 @@ std::expected<asio::ip::udp::endpoint, std::error_code> RtpSender::local_endpoin
     return context_->raw_sender_->local_endpoint();
 }
 
-std::expected<void, std::error_code> RtpSender::set_default_dst(
-    std::string_view address,
-    unsigned short port) {
+std::expected<void, std::error_code> RtpSender::set_default_dst(std::string_view address,
+                                                                unsigned short port) {
     return context_->raw_sender_->set_default_dst(address, port);
 }
 
-std::expected<void, std::error_code> RtpSender::set_default_dst(
-    const asio::ip::udp::endpoint& dst) {
+std::expected<void, std::error_code>
+RtpSender::set_default_dst(const asio::ip::udp::endpoint& dst) {
     return context_->raw_sender_->set_default_dst(dst);
 }
 
@@ -1207,27 +1140,19 @@ bool RtpSender::close(CloseCallback callback, bool close_socket) {
     return context_->raw_sender_->close(std::move(callback), close_socket);
 }
 
-void RtpSender::async_send_pkt(
-    std::span<const std::uint8_t> payload,
-    std::uint32_t timestamp,
-    const asio::ip::udp::endpoint& dst,
-    bool marker,
-    OnManagedRtpSend callback) {
+void RtpSender::async_send_pkt(std::span<const std::uint8_t> payload, std::uint32_t timestamp,
+                               const asio::ip::udp::endpoint& dst, bool marker,
+                               OnManagedRtpSend callback) {
     async_send_pkt_impl(payload, timestamp, dst, marker, std::move(callback));
 }
 
-void RtpSender::async_send_pkt(
-    std::span<const std::uint8_t> payload,
-    std::uint32_t timestamp,
-    bool marker,
-    OnManagedRtpSend callback) {
+void RtpSender::async_send_pkt(std::span<const std::uint8_t> payload, std::uint32_t timestamp,
+                               bool marker, OnManagedRtpSend callback) {
     async_send_pkt_impl(payload, timestamp, std::nullopt, marker, std::move(callback));
 }
 
-void RtpSender::async_send_pkt(
-    std::span<const std::uint8_t> payload,
-    const asio::ip::udp::endpoint& dst,
-    OnManagedRtpSend callback) {
+void RtpSender::async_send_pkt(std::span<const std::uint8_t> payload,
+                               const asio::ip::udp::endpoint& dst, OnManagedRtpSend callback) {
     async_send_pkt_impl(payload, std::nullopt, dst, false, std::move(callback));
 }
 
@@ -1235,98 +1160,74 @@ void RtpSender::async_send_pkt(std::span<const std::uint8_t> payload, OnManagedR
     async_send_pkt_impl(payload, std::nullopt, std::nullopt, false, std::move(callback));
 }
 
-void RtpSender::async_send_pkt_impl(
-    std::span<const std::uint8_t> payload,
-    std::optional<std::uint32_t> timestamp,
-    std::optional<asio::ip::udp::endpoint> dst,
-    bool marker,
-    OnManagedRtpSend callback) {
+void RtpSender::async_send_pkt_impl(std::span<const std::uint8_t> payload,
+                                    std::optional<std::uint32_t> timestamp,
+                                    std::optional<asio::ip::udp::endpoint> dst, bool marker,
+                                    OnManagedRtpSend callback) {
     const auto raw_exec = context_->raw_sender_->get_executor();
     std::vector<std::uint8_t> buffer(payload.size() + kFixedRtpHeaderSize);
     std::ranges::copy(payload, std::span(buffer).subspan(kFixedRtpHeaderSize).begin());
 
-    asio::dispatch(
-        raw_exec,
-        [context = context_,
-         buffer = std::move(buffer),
-         timestamp,
-         dst,
-         marker,
-         callback = std::move(callback)] mutable {
-            const auto& raw_sender = context->raw_sender_;
-            RtpPacketView pkt(buffer);
-            const auto current_state = timestamp ? context->state_.update_state(*timestamp, marker)
-                                                 : context->state_.update_state();
+    asio::dispatch(raw_exec, [context = context_, buffer = std::move(buffer), timestamp, dst,
+                              marker, callback = std::move(callback)] mutable {
+        const auto& raw_sender = context->raw_sender_;
+        RtpPacketView pkt(buffer);
+        const auto current_state = timestamp ? context->state_.update_state(*timestamp, marker)
+                                             : context->state_.update_state();
 
-            write_state_to_pkt(pkt, current_state);
+        write_state_to_pkt(pkt, current_state);
 
-            const auto payload_size =
-                narrow_cast<std::uint16_t>(buffer.size() - kFixedRtpHeaderSize);
-            const std::error_code err = pkt.set_payload_size(payload_size);
-            if (err) {
-                post_callback(
-                    raw_sender->get_executor(),
-                    std::move(callback),
-                    std::size_t{},
-                    err,
-                    std::uint16_t{});
-                return;
-            }
+        const auto payload_size = narrow_cast<std::uint16_t>(buffer.size() - kFixedRtpHeaderSize);
+        const std::error_code err = pkt.set_payload_size(payload_size);
+        if (err) {
+            post_callback(raw_sender->get_executor(), std::move(callback), std::size_t{}, err,
+                          std::uint16_t{});
+            return;
+        }
 
-            const auto exec = asio::get_associated_executor(callback, raw_sender->get_executor());
-            const std::span<const std::uint8_t> pkt_span(buffer);
-            auto raw_cb = bind_callback_executor(
-                exec,
-                [buf = std::move(buffer),
-                 cab = std::move(callback),
-                 seq = current_state.sequence_number_](
-                    std::size_t bytes_sent,
-                    const std::error_code& error) mutable {
-                    invoke_callback(std::move(cab), bytes_sent, error, seq);
-                });
+        const auto exec = asio::get_associated_executor(callback, raw_sender->get_executor());
+        const std::span<const std::uint8_t> pkt_span(buffer);
+        auto raw_cb = bind_callback_executor(
+            exec, [buf = std::move(buffer), cab = std::move(callback),
+                   seq = current_state.sequence_number_](std::size_t bytes_sent,
+                                                         const std::error_code& error) mutable {
+                invoke_callback(std::move(cab), bytes_sent, error, seq);
+            });
 
-            if (dst) {
-                raw_sender->async_send_pkt(pkt_span, *dst, std::move(raw_cb));
-            } else {
-                raw_sender->async_send_pkt(pkt_span, std::move(raw_cb));
-            }
-        });
+        if (dst) {
+            raw_sender->async_send_pkt(pkt_span, *dst, std::move(raw_cb));
+        } else {
+            raw_sender->async_send_pkt(pkt_span, std::move(raw_cb));
+        }
+    });
 }
 
-std::unique_ptr<RtpSender> make_rtp_sender(
-    const asio::any_io_executor& executor,
-    RtpSenderConfig config) {
+std::unique_ptr<RtpSender> make_rtp_sender(const asio::any_io_executor& executor,
+                                           RtpSenderConfig config) {
     return std::make_unique<RtpSender>(std::make_shared<BasicRawRtpSender>(executor), config);
 }
 
-std::unique_ptr<RtpSender> make_concurrent_rtp_sender(
-    const asio::any_io_executor& executor,
-    RtpSenderConfig config,
-    std::size_t queue_capacity) {
-    return std::make_unique<RtpSender>(
-        ConcurrentRawRtpSender::create(executor, queue_capacity),
-        config);
+std::unique_ptr<RtpSender> make_concurrent_rtp_sender(const asio::any_io_executor& executor,
+                                                      RtpSenderConfig config,
+                                                      std::size_t queue_capacity) {
+    return std::make_unique<RtpSender>(ConcurrentRawRtpSender::create(executor, queue_capacity),
+                                       config);
 }
 
 } // namespace RtpCpp
-
-
 
 namespace RtpCpp {
 
 using namespace Detail;
 
 template <typename RtpSenderType>
-RtpSession<RtpSenderType>::RtpSession(
-    std::shared_ptr<RtpSenderType> sender,
-    std::shared_ptr<RtpReceiver> receiver)
-    : sender_(std::move(sender))
-    , receiver_(std::move(receiver)) {}
+RtpSession<RtpSenderType>::RtpSession(std::shared_ptr<RtpSenderType> sender,
+                                      std::shared_ptr<RtpReceiver> receiver)
+    : sender_(std::move(sender)), receiver_(std::move(receiver)) {}
 
 template <typename RtpSenderType>
-std::expected<void, std::error_code> RtpSession<RtpSenderType>::bind(
-    std::string_view address,
-    unsigned short port) {
+std::expected<void, std::error_code> RtpSession<RtpSenderType>::bind(std::string_view address,
+                                                                     unsigned short port) {
     const auto endpoint_res = make_udp_endpoint(address, port);
 
 
@@ -1338,8 +1239,8 @@ std::expected<void, std::error_code> RtpSession<RtpSenderType>::bind(
 }
 
 template <typename RtpSenderType>
-std::expected<void, std::error_code> RtpSession<RtpSenderType>::bind(
-    const asio::ip::udp::endpoint& local) {
+std::expected<void, std::error_code>
+RtpSession<RtpSenderType>::bind(const asio::ip::udp::endpoint& local) {
     const auto shared_socket = std::make_shared<asio::ip::udp::socket>(sender_->get_executor());
     const auto skt_res = open_and_bind_udp_socket(shared_socket.get(), local);
     if (!skt_res) {
@@ -1360,9 +1261,7 @@ std::expected<void, std::error_code> RtpSession<RtpSenderType>::bind(
 template <typename RtpSenderType>
 bool RtpSession<RtpSenderType>::close(CloseCallback callback, bool close_socket) {
     return receiver_->close(
-        [sender = sender_,
-         receiver = receiver_,
-         callback = std::move(callback),
+        [sender = sender_, receiver = receiver_, callback = std::move(callback),
          close_socket] mutable {
             (void)sender->close(
                 [sender, receiver = std::move(receiver), callback = std::move(callback)] mutable {
@@ -1398,25 +1297,20 @@ RtpSession<BasicRawRtpSender> make_raw_rtp_session(const asio::any_io_executor& 
     return {std::make_shared<BasicRawRtpSender>(executor), std::make_shared<RtpReceiver>(executor)};
 }
 
-RtpSession<RtpSender> make_rtp_session(
-    const asio::any_io_executor& executor,
-    RtpSenderConfig sender_config) {
+RtpSession<RtpSender> make_rtp_session(const asio::any_io_executor& executor,
+                                       RtpSenderConfig sender_config) {
     return {make_rtp_sender(executor, sender_config), std::make_shared<RtpReceiver>(executor)};
 }
 
-RtpSession<RtpSender> make_concurrent_rtp_session(
-    const asio::any_io_executor& executor,
-    RtpSenderConfig sender_config,
-    std::size_t queue_capacity) {
-    return {
-        make_concurrent_rtp_sender(executor, sender_config, queue_capacity),
-        std::make_shared<RtpReceiver>(executor)};
+RtpSession<RtpSender> make_concurrent_rtp_session(const asio::any_io_executor& executor,
+                                                  RtpSenderConfig sender_config,
+                                                  std::size_t queue_capacity) {
+    return {make_concurrent_rtp_sender(executor, sender_config, queue_capacity),
+            std::make_shared<RtpReceiver>(executor)};
 }
 
 
 } // namespace RtpCpp
-
-
 
 namespace RtpCpp {
 
@@ -1454,8 +1348,6 @@ std::uint32_t generate_timestamp_offset() {
 
 } // namespace RtpCpp
 
-
-
 namespace RtpCpp {
 
 MediaClock::MediaClock(std::uint32_t sample_rate_hz)
@@ -1482,9 +1374,8 @@ std::uint32_t MediaClock::to_rtp_timestamp(std::chrono::nanoseconds hardware_tim
 
 namespace RtpCpp::Detail {
 
-std::expected<asio::ip::udp::endpoint, std::error_code> make_udp_endpoint(
-    std::string_view address,
-    unsigned short port) {
+std::expected<asio::ip::udp::endpoint, std::error_code> make_udp_endpoint(std::string_view address,
+                                                                          unsigned short port) {
     RtpCpp::asio_error_code err;
     const auto addr = asio::ip::make_address(std::string(address), err);
     if (err) {
@@ -1493,9 +1384,8 @@ std::expected<asio::ip::udp::endpoint, std::error_code> make_udp_endpoint(
     return asio::ip::udp::endpoint{addr, port};
 }
 
-std::expected<void, std::error_code> open_and_bind_udp_socket(
-    asio::ip::udp::socket* skt,
-    const asio::ip::udp::endpoint& endpoint) {
+std::expected<void, std::error_code>
+open_and_bind_udp_socket(asio::ip::udp::socket* skt, const asio::ip::udp::endpoint& endpoint) {
     RtpCpp::asio_error_code err;
 
     if (skt == nullptr) {
@@ -1518,7 +1408,6 @@ std::expected<void, std::error_code> open_and_bind_udp_socket(
 }
 
 } // namespace RtpCpp::Detail
-
 
 // clang-format off
 // NOLINTBEGIN -- Imported decoder; preserve the original implementation and layout.
@@ -1595,4 +1484,3 @@ uint32_t decode(uint32_t* state, uint32_t* codep, uint32_t byte) {
 
 // NOLINTEND
 // clang-format on
-

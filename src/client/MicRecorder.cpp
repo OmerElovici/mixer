@@ -1,19 +1,36 @@
 #include "MicRecorder.hpp"
-#include <expected>
-#include <memory>
-#include <system_error>
-#include <utility>
+#include <spdlog/spdlog.h>
+#include <span>
+#include "ISamplesProcessor.hpp"
 
-std::expected<std::unique_ptr<MicRecorder>, std::error_code>
-MicRecorder::create(const std::string& input_device) {
-    auto recorder = std::unique_ptr<MicRecorder>(new MicRecorder{});
-    if (!recorder->setDevice(input_device)) {
-        return std::unexpected(make_error_code(std::errc::no_such_device));
+bool MicRecorder::onStart() {
+    const bool proc_res = processor_->start();
+    if (!proc_res) {
+        spdlog::critical("Failed to start processor when initlizing MicRecorder");
+        return false;
     }
-
-    return std::move(recorder);
+    return true;
 }
 
-bool MicRecorder::onProcessSamples(const std::int16_t* /*samples*/, std::size_t /*sample_count*/) {
+bool MicRecorder::onProcessSamples(const std::int16_t* samples,
+                                   std::size_t sample_count) { // NOLINT
+
+    spdlog::info("packet size {}", sample_count);
+
+    if (processor_ != nullptr) {
+        const std::span<const std::int16_t> samples_view{samples, sample_count};
+        const bool pros_res = processor_->process_samples(samples_view);
+
+        if (!pros_res) {
+            spdlog::error("samples processor failed during process_samples");
+        }
+    } else {
+        return false;
+    }
+
     return true;
+}
+
+void MicRecorder::set_processor(ISamplesProcessor* processor) {
+    processor_ = processor;
 }
