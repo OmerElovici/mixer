@@ -1,8 +1,8 @@
-add_executable(client main.cpp
-  MicRecorder.cpp
-  Pacer.cpp
-  Client.cpp
-  AudioChunk.cpp)
+add_executable(client src/main.cpp
+  src/MicRecorder.cpp
+  src/Pacer.cpp
+  src/Client.cpp
+  src/AudioChunk.cpp)
 
 target_link_libraries(
   client
